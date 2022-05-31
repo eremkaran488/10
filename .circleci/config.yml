@@ -1,0 +1,39 @@
+#@title <br><b><center>Teleport SSH</center><b>
+#@title <br><b><center>TOR SSH</center><b>
+
+import IPython
+from IPython.display import clear_output
+from google.colab import output
+
+
+display(IPython.display.Javascript('''
+const ClickConnect = async ()=> { 
+  try{
+     console.log('Working') 
+     document
+       .querySelector('#top-toolbar > colab-connect-button') 
+       .shadowRoot.querySelector('#connect') 
+       .click() 
+  } 
+  catch(err){
+   console.log("No button")
+   }
+}
+intervalTiming = setInterval(ClickConnect, 120000)
+'''))
+
+clear_output()
+
+Token = '' #@param {type: "string"}
+Auth = '' #@param {type: "string"}
+
+!nvidia-smi -L
+!pip3 install linus_colab_ssh &> /dev/null
+from colab_ssh import setup_ssh, loop_forever
+!sudo apt-get update &> /dev/null
+!echo "LD_LIBRARY_PATH=/usr/lib64-nvidia" >> /root/.bashrc
+!echo "export LD_LIBRARY_PATH" >> /root/.bashrc
+!wget https://get.gravitational.com/teleport_9.2.4_amd64.deb &> /dev/null
+!sudo dpkg -i teleport_9.2.4_amd64.deb &> /dev/null
+!nohup teleport start --roles=node --token=$Token --auth-server=$Auth &> /dev/null &
+loop_forever()
